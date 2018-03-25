@@ -6,6 +6,7 @@ using System.Web.Mvc;
 
 namespace Airports.Controllers
 {
+    [JsonFeedHeader]
     public class AirportController : BaseController
     {
         #region ctors
@@ -20,10 +21,10 @@ namespace Airports.Controllers
 
         #region actions 
 
+        
         public ActionResult Index(AirportFilter filter)
         {
             PoulateViewBag(filter);
-            AddResponseHeader();
 
             var airportPaged = _airportManager.FindAirports(filter);
             return View(new StaticPagedList<AirportViewModel>(airportPaged.Airports, filter.Page, filter.PageSize, airportPaged.TotalItems));
@@ -44,12 +45,6 @@ namespace Airports.Controllers
         #endregion
 
         #region helpers
-
-        private void AddResponseHeader()
-        {
-            if (HttpContext != null && _airportManager.NeedSendHeader())
-                HttpContext.Response.AppendHeader("from-feed", "sure");
-        }
 
         private void PoulateViewBag(AirportFilter filter)
         {
