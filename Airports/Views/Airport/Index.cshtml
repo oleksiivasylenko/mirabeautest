@@ -1,0 +1,172 @@
+﻿@model PagedList.IPagedList<AirportViewModel>
+@using PagedList.Mvc;
+@using Airports.Base.ViewModels;
+@using Airports.Base.Enums;
+
+@{
+    ViewBag.Title = "Airports";
+}
+
+<h2>Airports</h2>
+
+<div>
+    <p>
+        Link for distance calculations: "http://ovasylenko.net/Airport/Distance?from=<b>fromIATA</b>&to=<b>toIATA</b>"
+    </p>
+    <p>
+        From: @Html.TextBox("From", ViewBag.From as string, new { id = "txtFrom" })
+        To: @Html.TextBox("To", ViewBag.To as string, new { id = "txtTo" })
+        <input id="calculateDistance" type="button" value="Calculate" />
+    </p>
+    <p id="distance">
+        The distance from <b id="spFrom"></b> to <b id="spTo"></b> is <b id="spDist"></b> km
+    </p>
+    <hr />
+</div>
+
+@using (Html.BeginForm("Index", "Airport", FormMethod.Get))
+{
+    <div class="row top-buff-10">
+        <div class="col-md-2">
+            ISO or Country Name
+        </div>
+        <div class="col-md-10">
+            @Html.TextBox("iso", ViewBag.ISO as string)
+        </div>
+    </div>
+    <div class="row top-buff-10">
+        <div class="col-md-2">
+            Name
+        </div>
+        <div class="col-md-10">
+            @Html.TextBox("name", ViewBag.Name as string)
+        </div>
+    </div>
+    <div class="row top-buff-10">
+        <div class="col-md-2">
+            Continent
+        </div>
+        <div class="col-md-10">
+            @Html.DropDownList("continent", EnumHelper.GetSelectList(typeof(AirportContinent)), new { @id = "ddContinents" })
+        </div>
+    </div>
+    <div class="row top-buff-10">
+        <div class="col-md-2">
+            Size
+        </div>
+        <div class="col-md-10">
+            @Html.DropDownList("size", EnumHelper.GetSelectList(typeof(AirportSize)), new { @id = "ddAirportSize" })
+        </div>
+    </div>
+    <div class="row top-buff-10">
+        <div class="col-md-2">
+            Type
+        </div>
+        <div class="col-md-10">
+            @Html.DropDownList("type", EnumHelper.GetSelectList(typeof(AirportType)), new { @id = "ddAirportType" })
+        </div>
+    </div>
+    <input class="top-buff-10" type="submit" value="Search" />
+}
+<div class="row top-buff-10">
+    <div class="col-md-12">
+        <table class="table">
+            <tr>
+                <th>
+                    @(Html.LabelFor<PagedList.IPagedList<AirportViewModel>, string>(m => m.FirstOrDefault().IATA))
+                </th>
+                <th>
+                    @(Html.LabelFor<PagedList.IPagedList<AirportViewModel>, string>(m => m.FirstOrDefault().ISO))
+                </th>
+                <th>
+                    @(Html.LabelFor<PagedList.IPagedList<AirportViewModel>, string>(m => m.FirstOrDefault().Country))
+                </th>
+                <th>
+                    @(Html.LabelFor<PagedList.IPagedList<AirportViewModel>, string>(m => m.FirstOrDefault().Name))
+                </th>
+                <th>
+                    @(Html.LabelFor<PagedList.IPagedList<AirportViewModel>, AirportContinent>(m => m.FirstOrDefault().Continent))
+                </th>
+                <th>
+                    @(Html.LabelFor<PagedList.IPagedList<AirportViewModel>, AirportType>(m => m.FirstOrDefault().Type))
+                </th>
+                <th>
+                    @(Html.LabelFor<PagedList.IPagedList<AirportViewModel>, AirportSize>(m => m.FirstOrDefault().Size))
+                </th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IATA)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ISO)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Country)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Continent)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Type)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Size)
+                    </td>
+                </tr>
+            }
+
+        </table>
+    </div>
+</div>
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+@Html.PagedListPager(Model, page => Url.Action("Index",
+        new { page, type = ViewBag.Type, size = ViewBag.Size, continent = ViewBag.Continent, name = ViewBag.Name, iso = ViewBag.ISO, }))
+
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+            $("#distance").hide();
+            setDDls();
+
+            $('#calculateDistance').click(function () {
+                var from = $("#txtFrom").val();
+                var to = $("#txtTo").val();
+                var href = "@Url.Action("Calculate", "Airport")" + "?from=" + from + "&to=" + to;
+
+                $.ajax({
+                    type: "post",
+                    url: href,
+                    success: function (resp) {
+                        if (resp.success)
+                            showDistance(resp.data)
+                        else
+                            alert(resp.message);
+                    }
+                });
+            });
+
+            function showDistance(data) {
+                $("#distance").show();
+
+                $('#spFrom').html(data.from);
+                $('#spTo').html(data.to);
+                $('#spDist').html(data.distance);
+            }
+
+            function setDDls() {
+                $("#ddContinents").val(@((int?)ViewBag.Continent));
+                $("#ddAirportSize").val(@((int?)ViewBag.Size));
+                $("#ddAirportType").val(@((int?)ViewBag.Type));
+            }
+        });
+    </script>
+}

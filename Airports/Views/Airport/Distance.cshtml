@@ -1,0 +1,11 @@
+﻿@model Airports.Base.ViewModels.DistanceViewModel
+
+@{
+    ViewBag.Title = "Distance";
+}
+
+<h2>Airports</h2>
+<span id="distance">
+    The distance from <b>@Html.DisplayFor(m => m.From)</b> to <b>@Html.DisplayFor(m => m.To)</b> is <b>@Html.DisplayFor(m => m.Distance)</b> km
+</span>
+
