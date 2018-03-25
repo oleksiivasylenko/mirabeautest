@@ -1,6 +1,6 @@
 ﻿using Airports.App_Start;
-using Airports.Base.ViewModels;
 using Airports.BLL.Managers;
+using Airports.Controllers;
 using AirportScheduler;
 using AutoMapper;
 using SimpleInjector;
