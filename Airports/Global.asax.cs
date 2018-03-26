@@ -1,4 +1,5 @@
 ﻿using Airports.App_Start;
+using Airports.Base.Exceptions;
 using Airports.BLL.Managers;
 using Airports.Controllers;
 using AirportScheduler;
@@ -9,6 +10,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using System.Web.UI;
 
 namespace Airports
 {
@@ -37,32 +39,29 @@ namespace Airports
         protected void Application_Error()
         {
             var ex = Server.GetLastError();
-            //ADD logger
-
             var httpContext = HttpContext.Current;
-            if (httpContext != null)
+
+            if (ex is AirportException && httpContext != null)
             {
                 RequestContext requestContext = ((MvcHandler)httpContext.CurrentHandler).RequestContext;
-                if (requestContext.HttpContext.Request.IsAjaxRequest())
-                {
-                    httpContext.Response.Clear();
-                    string controllerName = requestContext.RouteData.GetRequiredString("controller");
-                    IControllerFactory factory = ControllerBuilder.Current.GetControllerFactory();
-                    IController controller = factory.CreateController(requestContext, controllerName);
-                    ControllerContext controllerContext = new ControllerContext(requestContext, (ControllerBase)controller);
 
-                    JsonResult jsonResult = new JsonResult
-                    {
-                        Data = new { success = false, message = ex.Message },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
-                    jsonResult.ExecuteResult(controllerContext);
-                    httpContext.Response.End();
-                }
-                else
+                httpContext.Response.Clear();
+                string controllerName = requestContext.RouteData.GetRequiredString("controller");
+                IControllerFactory factory = ControllerBuilder.Current.GetControllerFactory();
+                IController controller = factory.CreateController(requestContext, controllerName);
+                ControllerContext controllerContext = new ControllerContext(requestContext, (ControllerBase)controller);
+
+                JsonResult jsonResult = new JsonResult
                 {
-                    httpContext.Response.Redirect("~/Error");
-                }
+                    Data = new { success = false, message = ex.Message },
+                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
+                };
+                jsonResult.ExecuteResult(controllerContext);
+                httpContext.Response.End();
+            }
+            else
+            {
+                httpContext.Response.Redirect("~/Error");
             }
         }
     }

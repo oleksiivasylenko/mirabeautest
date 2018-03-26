@@ -12,6 +12,8 @@ namespace Airports.Base.ViewModels
 
         public string To { get; set; }
 
+        public string Message { get; set; }
+
         #endregion
 
         #region ctors

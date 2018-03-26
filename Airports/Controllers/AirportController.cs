@@ -3,6 +3,8 @@ using Airports.Base.Filters;
 using Airports.BLL.Managers;
 using PagedList;
 using System.Web.Mvc;
+using Airports.Base.DBModels;
+using Airports.Base.Exceptions;
 
 namespace Airports.Controllers
 {
@@ -39,7 +41,14 @@ namespace Airports.Controllers
         [Route("distance")]
         public ActionResult Distance(string from, string to)
         {
-            return View("Distance", _airportManager.CalculateDistance(from, to));
+            try
+            {
+                return View("Distance", _airportManager.CalculateDistance(from, to));
+            }
+            catch (AirportException)
+            {
+                return View("Distance", new DistanceViewModel(0, new Airport(from), new Airport(to)) { Message = "Please provide correct IATAs!"});
+            }
         }
 
         #endregion

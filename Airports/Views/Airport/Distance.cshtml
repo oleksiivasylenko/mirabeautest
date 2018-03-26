@@ -5,7 +5,16 @@
 }
 
 <h2>Airports</h2>
-<span id="distance">
-    The distance from <b>@Html.DisplayFor(m => m.From)</b> to <b>@Html.DisplayFor(m => m.To)</b> is <b>@Html.DisplayFor(m => m.Distance)</b> km
-</span>
+<div id="distance">
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        @Model.Message
+    }
+    else
+    {
+        <span>
+            The distance from<b>@Html.DisplayFor(m => m.From)</b> to <b>@Html.DisplayFor(m => m.To)</b> is <b>@Html.DisplayFor(m => m.Distance)</b>km
+        </span>
+    }
+</div>
 

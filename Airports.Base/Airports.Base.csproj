@@ -57,6 +57,7 @@
     <Compile Include="Enums\AirportSize.cs" />
     <Compile Include="Enums\AirportType.cs" />
     <Compile Include="Enums\DistanceMeasuringUnit.cs" />
+    <Compile Include="Exceptions\AirportException.cs" />
     <Compile Include="Exceptions\EmptyParameterException.cs" />
     <Compile Include="Exceptions\ItemNotFoundException.cs" />
     <Compile Include="Extensions\AutoMapperConvertorExtensions.cs" />

@@ -32,6 +32,11 @@ namespace Airports.Base.DBModels
 
         }
 
+        public Airport(string name)
+        {
+            Name = name;
+        }
+
         public Airport(AirportDTO airportDTO)
         {
             IATA = airportDTO.IATA;
